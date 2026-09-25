@@ -5,8 +5,6 @@ Two architectures are preserved:
 1. **Option 1:** UiPath owns Chromium. A custom integration supplies its browser WebSocket endpoint and the exact page **TargetId**; this library attaches its own CDP session and seeds a registered virtual WebAuthn credential. UiPath navigates and continues in that same page.
 2. **Option 2:** A local .NET helper launches Chrome, owns CDP and completes the authentication sequence. It leaves Chrome running for a separately validated UiPath extension/native UI attach workflow.
 
-This implementation builds on a proof of concept created by a Salesforce architect and recommended to the repository owner by Salesforce Support. It adapts that approach for the two UiPath architectures described above. Automated tests cover protocol handling and local logic. The UiPath-specific CDP adapter and browser handoff still require integration with the target robot environment; this repository does not include a packaged UiPath activity.
-
 ## Build and test
 
 Install a .NET 8 SDK. From the repository root:
