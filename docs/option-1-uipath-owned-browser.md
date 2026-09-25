@@ -1,10 +1,10 @@
 # Option 1 — UiPath-owned Chromium
 
-## Status and contract
+## Integration interface
 
 The library implements attach → WebAuthn.enable → addVirtualAuthenticator → addCredential and retains the connection in `Option1WebAuthnSession`. Bootstrap installs an empty authenticator and exports its credential. JWT and frontdoor URL helpers are shared. The workflow must orchestrate navigation, readiness, capture/persistence and disposal.
 
-`ICdpSessionProvider` is an integration boundary, not a UiPath implementation. No verified UiPath endpoint/target API, activity package, XAML workflow or native transport adapter is included. `ConfiguredCdpSessionProvider` and `DelegateCdpSessionProvider` merely wrap values/lookups.
+`ICdpSessionProvider` connects the library to the UiPath-owned browser. Implement it in the custom activity or integration host to supply the browser endpoint and page target. `ConfiguredCdpSessionProvider` accepts those values directly; `DelegateCdpSessionProvider` obtains them through a caller-provided lookup. The library includes these provider helpers; the UiPath activity and workflow are application-specific.
 
 A provider must return:
 
@@ -12,14 +12,14 @@ A provider must return:
 new CdpSessionHandle(browserWebSocketEndpoint, TargetId: exactUiPathPageTargetId)
 ```
 
-**Do not pass UiPath's SessionId.** CDP sessions belong to the connection that attached them. This library opens a new WebSocket and must call `Target.attachToTarget` with `flatten = true` itself. The legacy `SessionId` parameter is retained for source compatibility but rejected at runtime, including when a TargetId is also supplied. A native UiPath session object would require a transport adapter that is not implemented here.
+**Do not pass UiPath's SessionId.** CDP sessions belong to the connection that attached them. This library opens a new WebSocket and must call `Target.attachToTarget` with `flatten = true` itself. Leave `SessionId` unset: supplying it causes a runtime error, even when a TargetId is supplied. Integrations using a native UiPath session object require a transport adapter.
 
-UiPath documents that Chromium Automation uses CDP. This does not document a supported public API for borrowing its connection or enabling a second client. Obtain confirmation for the installed UiPath version and test that a second CDP attachment does not disrupt the workflow. Check that its .NET runtime can load these `net8.0` assemblies; Windows Legacy/.NET Framework cannot.
+Use a documented UiPath-supported mechanism to obtain the endpoint and target for the installed UiPath version. Confirm support for an independent CDP connection and verify that attachment works alongside the UiPath workflow. The integration host must load `net8.0` assemblies; Windows Legacy/.NET Framework is incompatible.
 
 ## Developer procedure
 
 1. Restore/build/test using the README commands. Reference `Option1.UiPathIntegration` from a compatible custom integration host and deploy its `Cdp` and `Shared` dependencies.
-2. Implement `ICdpSessionProvider` using a **documented UiPath-supported mechanism** that returns the browser endpoint and exact current page target. Until that mechanism is identified, Option 1 cannot be run end-to-end as a UiPath workflow. Do not infer support from process discovery or internal fields.
+2. Implement `ICdpSessionProvider` using the supported endpoint/target lookup for the installed UiPath version. Return the browser endpoint and exact page target used by the workflow.
 3. Launch Chromium using UiPath and create its page before calling the library. Prevent UiPath from replacing the page/target during authentication.
 4. Bootstrap once: call `BootstrapSalesforceWebAuthn.BeginAsync`, retain the returned object in the running host, establish the approved initial session in the same page and trigger Salesforce's registration action. Confirm Salesforce accepted the registration, then call `CaptureCredentialAsync` and securely save it before disposing. It must contain exactly one credential; ambiguous selections fail.
 5. Normal run: load the saved credential; call `ConfigureSalesforceWebAuthn.BeginAsync`; keep the returned object alive. Obtain the OAuth token through `JwtBearerClient`, construct `Frontdoor.BuildUrl`, and have UiPath navigate the **same target** to that URL.
@@ -55,7 +55,5 @@ async Task AuthenticateInUiPathAsync(
 ```
 
 The outline uses the local POC store; replace it with a vault in deployment and preserve the primary error if cleanup also fails. The session object contains a live socket and must not be serialized across workflow persistence, jobs, processes or machines. An activity that exits a `using` scope immediately after setup destroys the authenticator too early. Implement a scope activity or a host lifetime spanning the challenge.
-
-A supplied supported **endpoint + TargetId** completes the transport boundary, but not the workflow: enrollment, navigation, success/user detection, durable counter updates, target continuity, runtime packaging and error handling still have to be wired into UiPath.
 
 Source: [UiPath Chromium Automation](https://docs.uipath.com/activities/other/latest/ui-automation/about-chromium-automation).

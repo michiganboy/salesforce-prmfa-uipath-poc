@@ -14,8 +14,8 @@ public interface ICdpSessionProvider
 }
 
 /// <summary>
-/// Describes the page to attach on a NEW connection. SessionId is retained only
-/// for source compatibility and is rejected: sessions cannot cross connections.
+/// Describes the page to attach on a new connection. Supply TargetId and leave
+/// SessionId unset: sessions cannot cross connections.
 /// </summary>
 public sealed record CdpSessionHandle(
     Uri BrowserWebSocketEndpoint,

@@ -33,11 +33,11 @@ Invoke the resulting `src/Option2.AuthHelper/bin/Release/net8.0/win-x64/publish/
 SalesforceAuthHelper.exe authenticate --config C:\RPA\SalesforcePrmfa\appsettings.local.json --return-url /lightning/page/home
 ```
 
-Wait for exit and require exit code 0. Then attach to the existing browser/page through the installed, validated extension/native UI automation mode. Confirm the intended Salesforce account and application before business actions. The published Windows executable and UiPath handoff still require validation on the target Windows robot.
+Wait for exit and require exit code 0. Then attach to the existing browser/page through the installed, validated extension/native UI automation mode. Confirm the intended Salesforce account and application before business actions. Test the published executable and browser attachment on the target Windows robot before running the full workflow.
 
 ## Ownership and lifecycle
 
-Chrome launches with `--remote-debugging-address=127.0.0.1`, the configured fixed debugging port and `--user-data-dir`. The launcher rejects an occupied port, observes early process exit and uses a cancellable 20-second discovery deadline. The port check is not an atomic reservation/ownership proof; other local processes are trusted in this POC. Profile isolation, loopback access control and profile cleanup remain operational responsibilities.
+Chrome launches with `--remote-debugging-address=127.0.0.1`, the configured fixed debugging port and `--user-data-dir`. The launcher rejects an occupied port, observes early process exit and uses a cancellable 20-second discovery deadline. The port check is not an atomic reservation/ownership proof; other local processes are trusted in this POC. Configure profile isolation and loopback access controls, and manage profile cleanup on the robot machine.
 
 Chrome remains open on success **and on failure** for inspection. Disposing its .NET `Process` wrapper does not kill it. Close the owned browser before retrying, or the port/profile checks should fail. The helper never closes unrelated browsers or kills a process tree. The debugging port remains available while Chrome runs; close the browser when automation is complete.
 
