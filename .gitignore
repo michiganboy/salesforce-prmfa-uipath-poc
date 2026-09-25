@@ -1,0 +1,36 @@
+# Build output
+bin/
+obj/
+artifacts/
+TestResults/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Secrets / local config
+appsettings.local.json
+*.pfx
+*.p12
+*.pem
+*.key
+*.crt
+credentials/
+.auth/
+secrets/
+
+# Browser profiles / runtime state
+browser-profile/
+chrome-profile/
+profiles/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Exported passkeys contain private keys
+webauthn-credential*.json
