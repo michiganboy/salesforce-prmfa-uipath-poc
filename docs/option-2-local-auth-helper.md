@@ -33,7 +33,7 @@ Invoke the resulting `src/Option2.AuthHelper/bin/Release/net8.0/win-x64/publish/
 SalesforceAuthHelper.exe authenticate --config C:\RPA\SalesforcePrmfa\appsettings.local.json --return-url /lightning/page/home
 ```
 
-Wait for exit and require exit code 0. Then attach to the existing browser/page through the installed, validated extension/native UI automation mode. Confirm the intended Salesforce account and application before business actions. The published Windows executable and UiPath handoff were not executed in this macOS engineering review.
+Wait for exit and require exit code 0. Then attach to the existing browser/page through the installed, validated extension/native UI automation mode. Confirm the intended Salesforce account and application before business actions. The published Windows executable and UiPath handoff still require validation on the target Windows robot.
 
 ## Ownership and lifecycle
 

@@ -34,7 +34,6 @@ Copy `examples/appsettings.example.json` to `appsettings.local.json` and replace
 
 - [Option 1: exact integration and lifetime steps](docs/option-1-uipath-owned-browser.md)
 - [Option 2: bootstrap, authenticate, publish and attach](docs/option-2-local-auth-helper.md)
-- [Engineering review: findings, verification, remaining assumptions](docs/engineering-review.md)
 
 The helper's exit code 0 means its configured readiness check and credential save completed. UiPath must still verify the intended logged-in user and page before business operations. A timeout, cancellation, navigation error, token failure or save failure must prevent the workflow from continuing.
 
@@ -44,4 +43,4 @@ The CDP transport has one receive loop, serialized writes, independent command c
 
 WebAuthn uses CTAP2/internal, resident-key support, simulated presence and simulated user verification. These are test authenticator settings, not evidence of a physical second factor or compliance with an org's PRMFA policy. Keep the owning CDP connection and target alive through the challenge. New tabs/popups/target replacement need separate integration work. After successful use, export and persist the updated signature counter before disposal. Reconcile state after crashes; do not run cloned credentials concurrently.
 
-The requested `frontdoor.jsp?sid=...&retURL=...` route is retained and encoded. It exposes a bearer token in the browser URL/history; do not log it. Salesforce recommends POST or the Single Access UI Bridge API for new integrations. That migration is deliberately outside this POC's preserved architecture. See the review's official sources and acceptance requirements.
+The requested `frontdoor.jsp?sid=...&retURL=...` route is retained and encoded. It exposes a bearer token in the browser URL/history; do not log it. Salesforce recommends POST or the Single Access UI Bridge API for new integrations. That migration is deliberately outside this POC's preserved architecture. See [Salesforce frontdoor guidance](https://help.salesforce.com/s/articleView?id=security_frontdoorjsp.htm&language=en_US&type=5) and [Single Access UI Bridge](https://help.salesforce.com/s/articleView?id=sf.frontdoor_singleaccess.htm&language=en_US&type=5).
